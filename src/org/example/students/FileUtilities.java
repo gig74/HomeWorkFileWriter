@@ -1,10 +1,8 @@
 package org.example.students;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -93,7 +91,8 @@ public class FileUtilities {
     public static ResultWritingFile writeListOut(File fileOut, List<String> listStringOut) throws IOException {
         verifyFileOut(fileOut);
         long start = System.currentTimeMillis();
-        try (FileWriter fileWriter = new FileWriter(fileOut, Charset.forName("UTF8"), false)) {
+        try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter(fileOut, StandardCharsets.UTF_8, false))) {
+//        try (FileWriter fileWriter = new FileWriter(fileOut, Charset.forName("UTF8"), false)) {
             for (String stringOut : listStringOut) {
                 fileWriter.write(stringOut + System.lineSeparator());
             }
@@ -107,6 +106,7 @@ public class FileUtilities {
         return resultWritingFile;
     }
 
+
     /**
      * Программа для чтения текстового файла в коллекцию
      * @param requestDir
@@ -114,21 +114,33 @@ public class FileUtilities {
      * @return
      * @throws IOException
      */
-    public static List<String> readTextFileInList(File requestDir, String requestNameFile) throws IOException {
-        StringBuilder result = new StringBuilder();
-        File file = FindFileInDir(requestDir, requestNameFile);
+    public static List<String> readTextFileInList( File requestDir, String requestNameFile) throws IOException {
 
-        try (FileReader fileReader = new FileReader(file)) {
-            int charCode = fileReader.read();
-            while(charCode != -1) {
-                    result.append((char) charCode);
-                charCode = fileReader.read();
+        File file = findFileInDir(requestDir, requestNameFile);
+        List<String> resultList = new ArrayList<>();
+
+//            StringBuilder result = new StringBuilder();
+//        try (FileReader fileReader = new FileReader(file)) {
+//            int charCode = fileReader.read();
+//            while(charCode != -1) {
+//                    result.append((char) charCode);
+//                charCode = fileReader.read();
+//            }
+//        } catch (IOException ex) {
+//            System.out.println(ex.getMessage()); // Написали про возникшее исключение
+//            throw ex; // И "прокинули" выше
+//        }
+//            List<String> resultList = Arrays.asList(result.toString().split("\\r?\\n"));
+
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String lineFromFile;
+                while ((lineFromFile = reader.readLine()) != null) {
+                    resultList.add(lineFromFile);
+                }
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage()); // Написали про возникшее исключение
+                throw ex; // И "прокинули" выше
             }
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage()); // Написали про возникшее исключение
-            throw ex; // И "прокинули" выше
-        }
-        List<String> resultList = Arrays.asList(result.toString().split("\\r?\\n"));
         return resultList;
     }
 
@@ -139,7 +151,7 @@ public class FileUtilities {
      * @return
      * @throws IOException
      */
-    public static File FindFileInDir(File rootDirectory, String fileName) throws IOException {
+    public static File findFileInDir(File rootDirectory, String fileName) throws IOException {
         File resultFile = null;
         final List<File> foundFilesList = new ArrayList<>();
         findFilesByName(rootDirectory, fileName, foundFilesList, 0);
@@ -155,7 +167,7 @@ public class FileUtilities {
     }
 
     /* рекурсивный метод для поиска файла в директории и поддиректориях */
-    public static List<File> findFilesByName(File rootDir, String filenameToSearch, List<File> foundFilesList, int countOfRecursion) {
+    public static void findFilesByName(File rootDir, String filenameToSearch, List<File> foundFilesList, int countOfRecursion) {
         if(countOfRecursion > MAX_CYCLE_FIND_DIRECTORY_COUNT) {
             throw new RuntimeException("Превышен уровень допустимой вложенности директорий");
         }
@@ -170,7 +182,6 @@ public class FileUtilities {
                 foundFilesList.add(file);
             }
         }
-        return files;
     }
 
 }

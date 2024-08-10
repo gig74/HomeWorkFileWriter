@@ -12,6 +12,7 @@ public class DataTest {
         List<String> stringList = new ArrayList<>();
         stringList.add("BEGIN");
         stringList.add("fkjsdfkds");
+        stringList.add("");
         stringList.add("ёёёёёёЁЁЁЁЁЁЁЁ~!@#$%^&*()_+");
         stringList.add("рвыашывфопекрцпзав");
         stringList.add("lfdls/.,flkfvlfdl;");
